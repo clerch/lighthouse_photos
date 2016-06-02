@@ -1,74 +1,52 @@
-$(document).ready(function() {
+
+$(document).ready(function () {
+
+  $photoList = $('#photos');
+
+  function insertPhoto(photo){
+    var $row = 'https://farm'+ photo.farm +'.staticflickr.com/'+ photo.server +'/'+ photo.id + '_'+photo.secret+'.jpg';
+    $photoList.attr("src",$row);
+  }
 
 
 
 
 
-
-
-
-
-$('#new_photo').on('click', function(e){
-    e.preventDefault();
+ 
+  $("#srch").submit(function (event) {
+    event.preventDefault();
     
-//this is where the action to the server actually happens
-    $.post('/contact-add.json', {
-      contact: {
-        first_name: first_name,
-        last_name: last_name,
-        email: email,
-        phone: phone      
-      }
-//this is the on success callback
-    }, function(data) {
-
-      //Note: we have to do this because we didn't specify the dataType to jQuery.
-      //Better approach is to just do that so we don't have to parse ourselves. Not
-      // a big deal but worth noting the difference between this callback and the getJSON callback.
-      // this is assuming that result.success will return true.
-      var result = JSON.parse(data);
-      if (result.success){
-        insertContact(result.contact);
-      } else {
-        alert(result.message);
+    var searchTerm = $("#search-box").val();
+    var Flickurl = "https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=eacfd2f2d41ccd0425b70dfcdfba8053&format=json&jsoncallback=?&tags=" + searchTerm;
+       
+    $.ajax({
+      url: Flickurl,
+      // jsonp: "callback",
+      dataType: "jsonp",
+      // data: {
+      //   format: "json",
+      //   jsoncallback: "?",
+      //   api_key: "eacfd2f2d41ccd0425b70dfcdfba8053",
+      //   method: 'flickr.photos.search',
+      //   tags: searchTerm
+      // },
+      success: function (data) {
+        console.log(data);
+        //Populate the images with the data
+        if (data.stat == "ok"){
+          var photo = data.photos.photo[0];
+          insertPhoto(photo);
+        } else {
+          alert(data.message);
+        }
       }
     });
   });
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 });
+
+
+
+
+
